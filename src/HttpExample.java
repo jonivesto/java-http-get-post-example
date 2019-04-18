@@ -3,12 +3,15 @@ import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 class HttpExample {
 
-    void get() throws Exception {
+    void get(String url, ArrayList<Param> params) throws Exception {
+        // Build url
+        url = url + "?" + buildParams(params);
+
         // Connection
-        String url = "https://www.example.com/";
         HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
 
         // Headers
@@ -28,9 +31,8 @@ class HttpExample {
         reader.close();
     }
 
-    void post() throws Exception {
+    void post(String url, ArrayList<Param> params) throws Exception {
         // Connection
-        String url = "https://www.example.com/";
         HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
 
         // Headers
@@ -38,13 +40,10 @@ class HttpExample {
         connection.setRequestProperty("User-Agent", "Mozilla/5.0");
         connection.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
-        // Post parameters
-        String params = "param1=value1&param2=value2";
-
         // Send post request
         connection.setDoOutput(true);
         DataOutputStream stream = new DataOutputStream(connection.getOutputStream());
-        stream.writeBytes(params);
+        stream.writeBytes(buildParams(params)); // Add params
         stream.flush();
         stream.close();
 
@@ -60,6 +59,23 @@ class HttpExample {
         }
 
         reader.close();
+    }
+
+    // Build params string
+    private String buildParams(ArrayList<Param> params){
+        StringBuilder stringBuilder = new StringBuilder();
+
+        // Build
+        for (Param param : params) {
+            stringBuilder.append(param.key);
+            stringBuilder.append("=");
+            stringBuilder.append(param.value);
+            stringBuilder.append("&");
+        }
+        // remove last '&'
+        stringBuilder.deleteCharAt(stringBuilder.length()-1);
+
+        return stringBuilder.toString();
     }
 
 }
